@@ -200,6 +200,7 @@ in
   users.users.revolve = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    initialPassword = "changeme";
     packages = with pkgs; [
       tree
     ];
@@ -281,6 +282,11 @@ in
     swayidle
     wl-clipboard
 
+  ];
+
+  # Create /etc/startup-url with default value if it doesn't exist
+  systemd.tmpfiles.rules = [
+    "f /etc/startup-url 0644 root root - https://tools.revolvepickleball.com/signage/courts-1-4"
   ];
 
   services.cage = {
