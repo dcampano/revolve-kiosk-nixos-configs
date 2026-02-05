@@ -27,6 +27,16 @@
             ./configuration.nix
           ];
         };
+        nixos-sd = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ({ modulesPath, ... }: {
+              imports = [ (modulesPath + "/installer/sd-card/sd-image-aarch64.nix") ];
+              nixpkgs.overlays = [ chromiumOverlay ];
+            })
+            ./configuration.nix
+          ];
+        };
       };
     };
 }
