@@ -52,12 +52,9 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
     read -r url < /etc/startup-url
 
     # Optional: wait a moment for sway to be ready
-    sleep 0.2
+    #sleep 1.5
 
       ${pkgs.chromium}/bin/chromium \
-        --ozone-platform=wayland \
-        --enable-features=UseOzonePlatform \
-        --disable-features=WaylandWindowDecorations \
         --kiosk \
         --start-maximized \
         --no-first-run \
@@ -65,7 +62,7 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
         --disable-infobars \
         --disable-session-crashed-bubble \
         --noerrdialogs \
-        "$url" || true
+        $url
 
   '';
 
@@ -82,7 +79,7 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
     seat seat0 hide_cursor 1000
 
     # Start the browser
-    exec_always ${kioskBrowser}
+    exec ${kioskBrowser}
 
     # Force Chromium fullscreen (Sway can enforce it)
     for_window [app_id="chromium"] fullscreen enable
