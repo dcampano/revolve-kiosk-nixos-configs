@@ -99,6 +99,8 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
     # Start the browser
     exec ${kioskBrowser}
 
+    exec_always ${pkgs.sway}/bin/swaymsg 'output * enable position 0 0'
+
     # Force Chromium fullscreen (Sway can enforce it)
     for_window [app_id="chromium"] fullscreen enable
     for_window [class="Chromium"] fullscreen enable
@@ -328,7 +330,12 @@ in
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      AllowAgentForwarding = "yes";
+    };
+  };
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [ 80 ];
