@@ -218,6 +218,21 @@ in
     packages = with pkgs; [
       tree
     ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDhHZiXRTjQfcrOAhME12N11ajU7Sl3bDdEMVX6Daquh"
+    ];
+  };
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.dcampano = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    packages = with pkgs; [
+      tree
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDhHZiXRTjQfcrOAhME12N11ajU7Sl3bDdEMVX6Daquh"
+    ];
   };
 
   users.motd = ''
