@@ -18,6 +18,24 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
   ${pkgs.chromium}/bin/chromium --kiosk --start-maximized --start-fullscreen --no-first-run --noerrdialogs --disable-infobars $url
 '';
 
+kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
+  pname = "kiosk-manager";
+  version = "0.2";
+
+  src = pkgs.fetchurl {
+    url = "https://revolve-kiosk-web-builds.s3.us-west-2.amazonaws.com/kiosk-manager-0.2.1";
+    # Get this with: nix store prefetch-file https://...  (or nix-prefetch-url)
+    sha256 = "sha256-0DnP/wN6trD3QU7QCnOLN8RnJQLd5d/wfNnFOwhW4xM=";
+  };
+
+  dontUnpack = true;
+
+  installPhase = ''
+    mkdir -p $out/bin
+    install -m 0755 $src $out/bin/kiosk-manager
+  '';
+};
+
 # Edit this URL
   kioskUrl = "https://example.com";
 
@@ -48,11 +66,11 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
 
   # Simple script to launch chromium (and restart it if it exits)
   kioskBrowser = pkgs.writeShellScript "kiosk-browser" ''
-    set -euo pipefail
+    #set -euo pipefail
     read -r url < /etc/startup-url
 
     # Optional: wait a moment for sway to be ready
-    #sleep 1.5
+    sleep 5
 
       ${pkgs.chromium}/bin/chromium \
         --kiosk \
@@ -84,10 +102,6 @@ cage-startup-script = pkgs.writeShellScriptBin "cage-startup.sh" ''
     # Force Chromium fullscreen (Sway can enforce it)
     for_window [app_id="chromium"] fullscreen enable
     for_window [class="Chromium"] fullscreen enable
-
-    # Prevent accidental exit (optional)
-    bindsym $mod+Shift+e nop "disabled"
-    bindsym $mod+Shift+c nop "disabled"
 
     # Optional: allow a manual restart key if you’re debugging
     # bindsym Ctrl+Alt+r exec ${pkgs.sway}/bin/swaymsg reload
@@ -279,6 +293,9 @@ in
     swayidle
     wl-clipboard
 
+    # Packages from the 'let' up top
+    kiosk-manager
+
   ];
 
   # Create /etc/startup-url with default value if it doesn't exist
@@ -318,6 +335,22 @@ in
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+  systemd.services.kiosk-manager = {
+    # These packages need to be added to the path
+    # because the kiosk-manager calls commands from them
+    path = with pkgs; [
+      bash
+      coreutils
+      libcec
+    ];
+    serviceConfig = {
+      User = "root";
+      PrivateTmp = "true";
+      ExecStart = "${kiosk-manager}/bin/kiosk-manager /etc/startup-url";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
