@@ -100,6 +100,7 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
     exec ${kioskBrowser}
 
     exec_always ${pkgs.sway}/bin/swaymsg 'output * enable position 0 0'
+    exec_always ${pkgs.sway}/bin/swaymsg 'output * mode 4096x2160'
 
     # Force Chromium fullscreen (Sway can enforce it)
     for_window [app_id="chromium"] fullscreen enable
