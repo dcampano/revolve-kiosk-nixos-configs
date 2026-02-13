@@ -61,7 +61,7 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
   # Weston kiosk-shell config
   westonConfig = pkgs.writeText "weston.ini" ''
     [core]
-    shell=kiosk-shell.so
+    shell=${pkgs.weston}/lib/weston/kiosk-shell.so
 
     [shell]
     client=${startKiosk}
