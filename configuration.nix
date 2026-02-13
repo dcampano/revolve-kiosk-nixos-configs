@@ -41,7 +41,7 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
 
   # Chromium launch script used as weston kiosk-shell client
   startKiosk = pkgs.writeShellScript "start-kiosk.sh" ''
-    set -euo pipefail
+    #set -euo pipefail
     read -r url < /etc/startup-url
 
     exec ${pkgs.chromium}/bin/chromium \
