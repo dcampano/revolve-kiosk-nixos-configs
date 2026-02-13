@@ -381,7 +381,7 @@ in
       chmod 700 /run/user/$(id -u)
 
       # Run Weston with kiosk-shell
-      exec ${pkgs.weston}/bin/weston --tty=1 --config=${westonConfig}
+      exec ${pkgs.weston}/bin/weston --config=${westonConfig}
     '';
   };
 
