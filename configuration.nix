@@ -63,9 +63,6 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
     [core]
     shell=${pkgs.weston}/lib/weston/kiosk-shell.so
 
-    [shell]
-    client=${startKiosk}
-
     [output]
     scale=1
   '';
@@ -380,8 +377,22 @@ in
       mkdir -p /run/user/$(id -u)
       chmod 700 /run/user/$(id -u)
 
-      # Run Weston with kiosk-shell
-      exec ${pkgs.weston}/bin/weston --config=${westonConfig}
+      # Start Weston in the background
+      ${pkgs.weston}/bin/weston --config=${westonConfig} &
+      WESTON_PID=$!
+
+      # Wait for the wayland socket
+      for i in $(seq 1 50); do
+        [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
+        sleep 0.1
+      done
+
+      # Launch Chromium (kiosk-shell will display it fullscreen)
+      export WAYLAND_DISPLAY=wayland-0
+      ${startKiosk}
+
+      # If chromium exits, stop weston too
+      kill $WESTON_PID 2>/dev/null
     '';
   };
 
