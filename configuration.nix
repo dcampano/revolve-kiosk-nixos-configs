@@ -47,15 +47,17 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
     exec ${pkgs.chromium}/bin/chromium \
       --ozone-platform=wayland \
       --enable-features=UseOzonePlatform \
-      --disable-features=WaylandWindowDecorations \
-      --kiosk \
-      --start-maximized \
       --no-first-run \
-      --no-default-browser-check \
-      --disable-infobars \
       --disable-session-crashed-bubble \
       --noerrdialogs \
-      $url
+      --disable-infobars \
+      --user-data-dir=/tmp/chromium-kiosk \
+      "$url"
+#      --disable-features=WaylandWindowDecorations \
+#      --kiosk \
+#      --start-maximized \
+#      --no-default-browser-check \
+#      $url
   '';
 
   # Weston kiosk-shell config
@@ -207,32 +209,32 @@ in
   #  w3m-nographics # needed for the manual anyway
     testdisk # useful for repairing boot problems
     ms-sys # for writing Microsoft boot sectors / MBRs
-    efibootmgr
-    efivar
-    parted
-    gptfdisk
-    ddrescue
-    ccrypt
-    cryptsetup # needed for dm-crypt volumes
+#    efibootmgr
+#    efivar
+#    parted
+#    gptfdisk
+#    ddrescue
+#    ccrypt
+#    cryptsetup # needed for dm-crypt volumes
 
     # Some text editors.
     vim
 
     # Some networking tools.
-    fuse
-    fuse3
-    sshfs-fuse
-    socat
-    screen
-    tcpdump
+#    fuse
+#    fuse3
+#    sshfs-fuse
+#    socat
+#    screen
+#    tcpdump
 
     # Hardware-related tools.
-    sdparm
-    hdparm
-    smartmontools # for diagnosing hard disks
-    pciutils
-    usbutils
-    nvme-cli
+#    sdparm
+#    hdparm
+#    smartmontools # for diagnosing hard disks
+#    pciutils
+#    usbutils
+#    nvme-cli
 
     # Some compression/archiver tools.
     unzip
@@ -249,8 +251,8 @@ in
     wget
     chromium
     sysstat
-    cage-startup-script
-    cage # debugging this
+#    cage-startup-script
+#    cage # debugging this
     libraspberrypi
     raspberrypi-eeprom
     git
@@ -335,11 +337,11 @@ in
   };
 
   #### Auto-login kiosk user on tty1
-  services.getty.autologinUser = "kiosk";
+#  services.getty.autologinUser = "kiosk";
 
   #### Optional but recommended: stop other ttys from stealing focus
-  systemd.services."getty@tty1".enable = false;
-  systemd.services."autovt@tty1".enable = false;
+#  systemd.services."getty@tty1".enable = false;
+#  systemd.services."autovt@tty1".enable = false;
 
   #### Start Weston kiosk-shell automatically on boot
   systemd.services.weston-kiosk = {
@@ -378,21 +380,28 @@ in
       chmod 700 /run/user/$(id -u)
 
       # Start Weston in the background
-      ${pkgs.weston}/bin/weston --config=${westonConfig} &
-      WESTON_PID=$!
-
-      # Wait for the wayland socket
-      for i in $(seq 1 50); do
-        [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
-        sleep 0.1
-      done
-
-      # Launch Chromium (kiosk-shell will display it fullscreen)
-      export WAYLAND_DISPLAY=wayland-0
-      ${startKiosk}
-
-      # If chromium exits, stop weston too
-      kill $WESTON_PID 2>/dev/null
+      #${pkgs.weston}/bin/weston --shell=kiosk --config=${westonConfig} &
+      ${pkgs.weston}/bin/weston --shell=kiosk -- ${startKiosk}
+    
+#      ${pkgs.weston}/bin/weston --shell=kiosk &
+#      WESTON_PID=$!
+#
+#      echo "IN HERE 1"
+#      # Wait for the wayland socket
+#      for i in $(seq 1 50); do
+#        [ -S "$XDG_RUNTIME_DIR/wayland-0" ] && break
+#        sleep 0.1
+#      done
+#      echo "IN HERE 2"
+#
+#      # Launch Chromium (kiosk-shell will display it fullscreen)
+#      export WAYLAND_DISPLAY=wayland-0
+#      ${startKiosk}
+#
+#      echo "IN HERE 3"
+#
+#      # If chromium exits, stop weston too
+#      kill $WESTON_PID 2>/dev/null
     '';
   };
 
