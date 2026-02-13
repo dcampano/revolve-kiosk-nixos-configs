@@ -67,7 +67,6 @@ kiosk-manager = pkgs.stdenvNoCC.mkDerivation {
     client=${startKiosk}
 
     [output]
-    mode=4096x2160
     scale=1
   '';
 
