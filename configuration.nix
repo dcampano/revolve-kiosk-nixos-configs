@@ -91,6 +91,7 @@ in
   boot.loader.generic-extlinux-compatible.enable = true;
 
   hardware.enableAllFirmware = true;
+  hardware.graphics.enable = true;
 
   # networking.hostName = "nixos"; # Define your hostname.
 
