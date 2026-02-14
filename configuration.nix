@@ -36,6 +36,7 @@ startKiosk = pkgs.writeShellScript "start-kiosk.sh" ''
     --disable-session-crashed-bubble \
     --noerrdialogs \
     --disable-infobars \
+    --incognito \
     --user-data-dir=/tmp/chromium-kiosk \
     "$url"
 '';
