@@ -293,6 +293,7 @@ in
       # Isolated /tmp + /var/tmp
       PrivateTmp = true;
 
+      # Chromium profile is set to use /tmp as the profile directory
       # Force tmpfs mounts *inside the service* (RAM), regardless of host /tmp
       TemporaryFileSystem = [
         "/tmp:rw,size=256M,mode=1777"
