@@ -290,6 +290,15 @@ in
       Restart = "always";
       RestartSec = 2;
 
+      # Isolated /tmp + /var/tmp
+      PrivateTmp = true;
+
+      # Force tmpfs mounts *inside the service* (RAM), regardless of host /tmp
+      TemporaryFileSystem = [
+        "/tmp:rw,size=256M,mode=1777"
+        "/var/tmp:rw,size=128M,mode=1777"
+      ];
+
       # Needed for DRM/input access on embedded boxes
       SupplementaryGroups = [ "video" "input" "render" ];
     };
