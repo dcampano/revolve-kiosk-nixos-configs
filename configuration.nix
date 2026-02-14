@@ -296,7 +296,6 @@ in
       # Force tmpfs mounts *inside the service* (RAM), regardless of host /tmp
       TemporaryFileSystem = [
         "/tmp:rw,size=256M,mode=1777"
-        "/var/tmp:rw,size=128M,mode=1777"
       ];
 
       # Needed for DRM/input access on embedded boxes
