@@ -54,6 +54,16 @@ in
     "flakes"
   ];
 
+  nix.settings = {
+    substituters = [
+      "https://revolve-nixos-store-kiosk.s3.us-east-2.amazonaws.com"
+    ];
+
+    trusted-public-keys = [
+      "revolve-cache:EEEhECPAn/W1x7Vm/W856mrE2jM4QstWplstPW9BjG0="
+    ];
+  };
+
   nixpkgs.config.allowUnfree = true;
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
