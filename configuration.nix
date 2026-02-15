@@ -54,6 +54,16 @@ in
     "flakes"
   ];
 
+  nix.settings = {
+    substituters = [
+      "https://revolve-nixos-store-kiosk.s3.us-east-2.amazonaws.com"
+    ];
+
+    trusted-public-keys = [
+      "revolve-cache:EEEhECPAn/W1x7Vm/W856mrE2jM4QstWplstPW9BjG0="
+    ];
+  };
+
   nixpkgs.config.allowUnfree = true;
 
   # Use the extlinux boot loader. (NixOS wants to enable GRUB by default)
@@ -139,6 +149,7 @@ in
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDhHZiXRTjQfcrOAhME12N11ajU7Sl3bDdEMVX6Daquh"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDC1Qfrw1TbFJBnZ96PXpdcAMuUuWyD+U37Zx5vTqs97"
     ];
   };
 
@@ -151,6 +162,7 @@ in
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDhHZiXRTjQfcrOAhME12N11ajU7Sl3bDdEMVX6Daquh"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDC1Qfrw1TbFJBnZ96PXpdcAMuUuWyD+U37Zx5vTqs97"
     ];
   };
 
@@ -267,8 +279,9 @@ in
   systemd.services.weston-kiosk = {
     description = "Weston kiosk-shell session on tty1";
     wantedBy = [ "multi-user.target" ];
-    after = [ "systemd-user-sessions.service" "network-online.target" ];
-    wants = [ "network-online.target" ];
+    after = [ "systemd-logind.service" "getty@tty1.service" "systemd-user-sessions.service" "network-online.target" ];
+    wants = [ "systemd-logind.service" "getty@tty1.service" "network-online.target" ];
+    conflicts = [ "getty@tty1.service" ];
 
     serviceConfig = {
       User = "kiosk";
@@ -301,16 +314,17 @@ in
 
       # Needed for DRM/input access on embedded boxes
       SupplementaryGroups = [ "video" "input" "render" ];
+
+# Leaving this here in case we have issues with weston launching on boot
+#      # Wait until DRM node is present
+#      ExecStartPre = [
+#        "/run/current-system/sw/bin/bash -lc 'for i in {1..60}; do ([ -e /dev/dri/card0 ] || [ -e /dev/dri/card1 ]) && exit 0; sleep 0.25; done; echo \"DRM not ready\"; exit 1'"
+#      ];
+
+      ExecStart = "${pkgs.weston}/bin/weston --backend=drm-backend.so --shell=kiosk -- ${startKiosk}";
+
     };
 
-    script = ''
-      # Ensure runtime dir exists (usually handled by pam_systemd, but safe)
-      mkdir -p /run/user/$(id -u)
-      chmod 700 /run/user/$(id -u)
-
-      # Start Weston in the background
-      ${pkgs.weston}/bin/weston --shell=kiosk -- ${startKiosk}
-    '';
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
