@@ -2,10 +2,10 @@
   description = "NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # Leaving this here in case there is ever a reason that I 
     # need to pin Chromium to a specific revision
-    nixpkgs-chromium.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-chromium.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, nixpkgs-chromium, ... }:
