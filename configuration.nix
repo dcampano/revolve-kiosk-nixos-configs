@@ -62,6 +62,10 @@ in
     trusted-public-keys = [
       "revolve-cache:EEEhECPAn/W1x7Vm/W856mrE2jM4QstWplstPW9BjG0="
     ];
+    # Limit the number of jobs and cores
+    # so a nixos-rebuild doesn't freeze the pi
+    max-jobs = 1;
+    cores = 1;
   };
 
   nixpkgs.config.allowUnfree = true;
