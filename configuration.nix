@@ -327,6 +327,29 @@ in
 
   };
 
+  # Wake display via HDMI CEC at 4:00 AM daily
+  systemd.services.cec-wake-display = {
+    description = "Wake display via HDMI CEC";
+    path = [ pkgs.libcec ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      echo "as" | cec-client -s
+      sleep 15
+      echo "as" | cec-client -s
+      sleep 15
+      echo "as" | cec-client -s
+    '';
+  };
+
+  systemd.timers.cec-wake-display = {
+    description = "Run CEC wake display daily at 4:00 AM";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 04:00:00";
+      Persistent = true;
+    };
+  };
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
