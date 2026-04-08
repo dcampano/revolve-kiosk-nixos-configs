@@ -30,6 +30,7 @@ startKiosk = pkgs.writeShellScript "start-kiosk.sh" ''
   read -r url < /etc/startup-url
 
   exec ${pkgs.chromium}/bin/chromium \
+    --kiosk \
     --ozone-platform=wayland \
     --enable-features=UseOzonePlatform \
     --no-first-run \
